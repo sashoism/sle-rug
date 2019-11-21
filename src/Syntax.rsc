@@ -20,17 +20,19 @@ syntax Question
 // and use C/Java style precedence rules (look it up on the internet)
 syntax Expr 
   = Id \ "true" \ "false" // true/false are reserved keywords.
+  | left Expr "+" Expr
   ;
   
-syntax Type
-  = ;  
+syntax Type = Id ":" ("boolean" | "integer" | "string") ("=" Expr)?;
   
-lexical Str = ;
+lexical Str = [\"] ![\"]* [\"];
 
-lexical Int 
-  = ;
+lexical Int
+ = "0"
+ | [1-9][0-9]*
+ ;
 
-lexical Bool = ;
-
-
-
+lexical Bool
+ = "true"
+ | "false"
+ ;
