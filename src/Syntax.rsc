@@ -20,7 +20,11 @@ syntax Question
 // and use C/Java style precedence rules (look it up on the internet)
 syntax Expr 
   = Id \ "true" \ "false" // true/false are reserved keywords.
-  | left Expr "+" Expr
+  | right "!" Expr 
+  > left Expr ("+" | "-" | "*" | "/" | "&&" | "||" | "\>" | "\<" | "\>=" | "\<=" | "==" | "!=") Expr
+  | Bool
+  | Int
+  | Str
   ;
   
 syntax Type = Id ":" ("boolean" | "integer" | "string") ("=" Expr)?;
