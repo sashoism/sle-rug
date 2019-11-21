@@ -12,7 +12,8 @@ start syntax Form
 
 // TODO: question, computed question, block, if-then-else, if-then
 syntax Question
-  = 
+  = Str Type
+  | "if (" Expr ")" "{" Question* "}" ("else {" Question "}")?
   ; 
 
 // TODO: +, -, *, /, &&, ||, !, >, <, <=, >=, ==, !=, literals (bool, int, str)
