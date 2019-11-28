@@ -30,7 +30,7 @@ syntax Expr
   
 syntax Answer
  = Id ":" Type
- | Id ":" Type ("=" Expr)?
+ | Id ":" Type "=" Expr
  ;
 
 syntax Type
