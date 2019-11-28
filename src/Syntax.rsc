@@ -12,7 +12,7 @@ start syntax Form
 
 // TODO: question, computed question, block, if-then-else, if-then
 syntax Question
-  = Str Type
+  = Str Answer
   | "if (" Expr ")" "{" Question* "}" ("else {" Question "}")?
   ; 
 
@@ -28,7 +28,16 @@ syntax Expr
   | Str
   ;
   
-syntax Type = Id ":" ("boolean" | "integer" | "string") ("=" Expr)?;
+syntax Answer
+ = Id ":" Type
+ | Id ":" Type ("=" Expr)?
+ ;
+
+syntax Type
+ = "boolean"
+ | "integer"
+ | "string"
+ ;
   
 lexical Str = [\"] ![\"]* [\"];
 
