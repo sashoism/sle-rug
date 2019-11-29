@@ -12,7 +12,10 @@ data AForm(loc src = |tmp:///|)
   ; 
 
 data AQuestion(loc src = |tmp:///|)
-  = question(str label, AAnswer answer)
+  = question(str label, AId id, AType \type)
+  | question(str label, AId id, AType \type, AExpr expr)
+  | \if(AExpr condition, list[AQuestion] questions)
+  | \if_else(AExpr condition, list[AQuestion] questions, list[AQuestion] alt_questions)
   ; 
 
 data AExpr(loc src = |tmp:///|)
@@ -23,15 +26,4 @@ data AId(loc src = |tmp:///|)
   = id(str name);
 
 data AType(loc src = |tmp:///|)
-  = \type(str \type);
-
-data AAnswer(loc src = |tmp:///|)
-  = answer(AId name, AType \type)
-  | answer(AId name, AType \type, AExpr expr)
-  ;
-
-AForm implode(start[Form] m)
-  = implode(m.top);
-
-AForm implode((Form)`form <Id name> { <Question* qs> }`)
-  = form("<name>", []);
+  = boolean() | integer() | string();
