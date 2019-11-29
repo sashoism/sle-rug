@@ -16,18 +16,31 @@ import String;
  * - See the ref example on how to obtain and propagate source locations.
  */
 
-AForm cst2ast(start[Form] sf) {
-  Form f = sf.top; // remove layout before and after form
-  return form("", [], src=f@\loc); 
-}
+AForm cst2ast(start[Form] sf)
+ = cst2ast(sf.top);
+
+AForm cst2ast((Form) `form <Id title> { <Question* qs> }`)
+ = form("<title>", [ cst2ast(q) | Question q <- qs ]);
 
 AQuestion cst2ast(Question q) {
-  throw "Not yet implemented";
+  switch (q) {
+  	case (Question) `<Str label> <Id var> : <Type t>`:
+  		return question("<label>"[1..-1], id("<var>"), cst2ast(t));
+  	case (Question) `<Str label> <Id var> : <Type t> = <Expr expr>`:
+  		return question("<label>"[1..-1], id("<var>"), cst2ast(t), cst2ast(expr));
+  	case (Question) `if ( <Expr condition> ) { <Question* qs> }`:
+  		return \if(cst2ast(condition), [ cst2ast(q) | Question q <- qs ]);
+	case (Question) `if ( <Expr condition> ) { <Question* qs> } else { <Question* alt_qs> }`:
+  		return \if_else(cst2ast(condition),
+					[ cst2ast(q) | Question q <- qs ],
+  					[ cst2ast(q) | Question q <- alt_qs ]
+  				);
+  }
 }
 
 AExpr cst2ast(Expr e) {
   switch (e) {
-    case (Expr)`<Id x>`: return ref("<x>", src=x@\loc);
+    case (Expr)`<Id x>`: return ref(id("<x>"));
     
     // etc.
     
@@ -36,5 +49,12 @@ AExpr cst2ast(Expr e) {
 }
 
 AType cst2ast(Type t) {
-  throw "Not yet implemented";
+  switch (t) {
+  	case (Type) `boolean`:
+  		return boolean();
+  	case (Type) `integer`:
+  		return integer();
+  	case (Type) `string`:
+  		return string();
+  }
 }
