@@ -22,17 +22,31 @@ syntax Question
 // Think about disambiguation using priorities and associativity
 // and use C/Java style precedence rules (look it up on the internet)
 syntax Expr 
- = Id \ Bool \ Type
- | right "!" Expr
- > left Expr ("*" | "/") Expr
- > left Expr ("+" | "-") Expr
- > left Expr ("\<" | "\<=" | "\>" | "\>=") Expr
- > left Expr ("==" | "!=") Expr
- > left Expr "&&" Expr
- > left Expr "||" Expr
- | Bool
- | Int
- | Str
+ = Id \ "true" \ "false" \ "boolean" \ "integer" \ "string"
+ | right neg: "!" Expr
+ > left (
+    mul: Expr "*" Expr
+  | div: Expr "/" Expr
+ )
+ > left (
+    add: Expr "+" Expr
+  | sub: Expr "-" Expr
+ )
+ > non-assoc (
+    gt: Expr "\>" Expr
+  | geq: Expr "\>=" Expr
+  | lt: Expr "\<" Expr
+  | leq: Expr "\<=" Expr
+ )
+ > non-assoc (
+    eq: Expr "==" Expr
+  | neq: Expr "!=" Expr
+ )
+ > left and: Expr "&&" Expr
+ > left or: Expr "||" Expr
+ | \bool: Bool
+ | \int: Int
+ | \str: Str
  ;
 
 syntax Type
