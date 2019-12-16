@@ -30,9 +30,9 @@ AForm cst2ast(start[Form] sf) {
 AQuestion cst2ast(Question q) {
   switch (q) {
   	case (Question) `<Str label> <Id var> : <Type t>`:
-  		return question("<label>"[1..-1], id("<var>"), cst2ast(t));
+  		return question("<label>"[1..-1], id("<var>", src=var@\loc), cst2ast(t));
   	case (Question) `<Str label> <Id var> : <Type t> = <Expr expr>`:
-  		return question("<label>"[1..-1], id("<var>"), cst2ast(t), cst2ast(expr));
+  		return question("<label>"[1..-1], id("<var>", src=var@\loc), cst2ast(t), cst2ast(expr));
   	case (Question) `if ( <Expr condition> ) { <Question* qs> }`:
   		return \if(cst2ast(condition), [ cst2ast(q) | Question q <- qs ]);
 	case (Question) `if ( <Expr condition> ) { <Question* qs> } else { <Question* alt_qs> }`:
