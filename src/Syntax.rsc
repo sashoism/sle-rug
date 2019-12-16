@@ -6,14 +6,17 @@ extend lang::std::Id;
 /*
  * Concrete syntax of QL
  */
+ 
+keyword Reserved = "form" | "if" | "else" | "boolean" | "integer" | "string" | "true" | "false";
+lexical Ident = Id \ Reserved;
 
 start syntax Form 
- = "form" Id "{" Question* "}";
+ = "form" Ident "{" Question* "}";
 
 // TODO: question, computed question, block, if-then-else, if-then
 syntax Question
- = Str Id ":" Type
- | Str Id ":" Type "=" Expr
+ = Str Ident ":" Type
+ | Str Ident ":" Type "=" Expr
  | "if (" Expr ")" "{" Question* "}"
  | "if (" Expr ")" "{" Question* "}" "else" "{" Question* "}"
  ;
@@ -21,9 +24,11 @@ syntax Question
 // TODO: +, -, *, /, &&, ||, !, >, <, <=, >=, ==, !=, literals (bool, int, str)
 // Think about disambiguation using priorities and associativity
 // and use C/Java style precedence rules (look it up on the internet)
+
 syntax Expr 
- = Id \ "true" \ "false" \ "boolean" \ "integer" \ "string"
- | right neg: "!" Expr
+ = Ident
+ | "(" Expr ")"
+ > right neg: "!" Expr
  > left (
     mul: Expr "*" Expr
   | div: Expr "/" Expr
@@ -38,8 +43,8 @@ syntax Expr
   | lt: Expr "\<" Expr
   | leq: Expr "\<=" Expr
  )
- > non-assoc (
-    eq: Expr "==" Expr
+ > non-assoc ( // the (in-) equality operator is better off non-associative, enforcing parentheses
+    eql: Expr "==" Expr
   | neq: Expr "!=" Expr
  )
  > left and: Expr "&&" Expr

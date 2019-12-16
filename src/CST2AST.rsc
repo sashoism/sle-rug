@@ -21,7 +21,7 @@ import Boolean;
 AForm cst2ast(start[Form] sf)
  = cst2ast(sf.top);
 
-AForm cst2ast((Form) `form <Id title> { <Question* qs> }`)
+AForm cst2ast((Form) `form <Ident title> { <Question* qs> }`)
  = form("<title>", [ cst2ast(q) | Question q <- qs ]);
 
 AQuestion cst2ast(Question q) {
@@ -42,7 +42,8 @@ AQuestion cst2ast(Question q) {
 
 AExpr cst2ast(Expr e) {
   switch (e) {
-    case (Expr)`<Id x>`: return ref(id("<x>", src=x@\loc), src=x@\loc);
+    case (Expr)`<Ident x>`: return ref(id("<x>", src=x@\loc), src=x@\loc);
+    case (Expr)`( <Expr expr> )`: return cst2ast(expr);
     case (Expr)`!<Expr expr>`: return neg(cst2ast(expr));
     case (Expr)`<Expr lhs> * <Expr rhs>`: return mul(cst2ast(lhs), cst2ast(rhs));
     case (Expr)`<Expr lhs> / <Expr rhs>`: return div(cst2ast(lhs), cst2ast(rhs));
@@ -52,13 +53,13 @@ AExpr cst2ast(Expr e) {
     case (Expr)`<Expr lhs> \>= <Expr rhs>`: return geq(cst2ast(lhs), cst2ast(rhs));
     case (Expr)`<Expr lhs> \< <Expr rhs>`: return lt(cst2ast(lhs), cst2ast(rhs));
     case (Expr)`<Expr lhs> \<= <Expr rhs>`: return leq(cst2ast(lhs), cst2ast(rhs));
-    case (Expr)`<Expr lhs> == <Expr rhs>`: return eq(cst2ast(lhs), cst2ast(rhs));
+    case (Expr)`<Expr lhs> == <Expr rhs>`: return eql(cst2ast(lhs), cst2ast(rhs));
     case (Expr)`<Expr lhs> != <Expr rhs>`: return neq(cst2ast(lhs), cst2ast(rhs));
     case (Expr)`<Expr lhs> && <Expr rhs>`: return and(cst2ast(lhs), cst2ast(rhs));
     case (Expr)`<Expr lhs> || <Expr rhs>`: return or(cst2ast(lhs), cst2ast(rhs));
-    case (Expr)`<Bool b>`: return \bool(fromString("<b>"));
-    // int
-    // string
+    case (Expr)`<Bool val>`: return \bool(fromString("<val>"));
+    case (Expr)`<Int val>`: return \int(toInt("<val>"));
+    case (Expr)`<Str val>`: return \str("<val>"[1..-1]);
     default: throw "Unhandled expression: <e>";
   }
 }
