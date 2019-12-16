@@ -18,11 +18,14 @@ import Boolean;
  * - See the ref example on how to obtain and propagate source locations.
  */
 
-AForm cst2ast(start[Form] sf)
- = cst2ast(sf.top);
-
-AForm cst2ast((Form) `form <Ident title> { <Question* qs> }`)
- = form("<title>", [ cst2ast(q) | Question q <- qs ]);
+AForm cst2ast(start[Form] sf) {
+  Form f = sf.top; // remove layout before and after form
+  switch (f) {
+	case (Form) `form <Ident title> { <Question* qs> }`:
+	  return form("<title>", [ cst2ast(q) | Question q <- qs ], src=f@\loc);
+	default: throw "Unhandled form expression: <f>";
+  }
+}
 
 AQuestion cst2ast(Question q) {
   switch (q) {
