@@ -13,10 +13,10 @@ data AForm(loc src = |tmp:///|)
 
 data AQuestion(loc src = |tmp:///|)
   = question(str label, AId id, AType \type)
-  | question(str label, AId id, AType \type, AExpr expr)
+  | question(str label, AId id, AType \type, AExpr expr) // maybe rename to computed_question?
   | \if(AExpr condition, list[AQuestion] questions)
   | \if_else(AExpr condition, list[AQuestion] questions, list[AQuestion] alt_questions)
-  ; 
+  ;
 
 data AExpr(loc src = |tmp:///|)
   = ref(AId id)
