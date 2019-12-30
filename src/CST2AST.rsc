@@ -36,7 +36,7 @@ AQuestion cst2ast(Question q) {
   	case (Question) `if ( <Expr condition> ) { <Question* qs> }`:
   		return \if(cst2ast(condition), [ cst2ast(q) | Question q <- qs ], src=q@\loc);
 	case (Question) `if ( <Expr condition> ) { <Question* qs> } else { <Question* alt_qs> }`:
-  		return \if_else(cst2ast(condition),
+  		return if_else(cst2ast(condition),
 					[ cst2ast(q) | Question q <- qs ],
 					[ cst2ast(q) | Question q <- alt_qs ], src=q@\loc
   				);
@@ -47,11 +47,13 @@ AExpr cst2ast(Expr e) {
   switch (e) {
     case (Expr)`<Ident x>`: return ref(id("<x>", src=x@\loc), src=x@\loc);
     case (Expr)`( <Expr expr> )`: return cst2ast(expr);
-    case (Expr)`!<Expr expr>`: return neg(cst2ast(expr), src=e@\loc);
+
     case (Expr)`<Expr lhs> * <Expr rhs>`: return mul(cst2ast(lhs), cst2ast(rhs), src=e@\loc);
     case (Expr)`<Expr lhs> / <Expr rhs>`: return div(cst2ast(lhs), cst2ast(rhs), src=e@\loc);
     case (Expr)`<Expr lhs> + <Expr rhs>`: return add(cst2ast(lhs), cst2ast(rhs), src=e@\loc);
     case (Expr)`<Expr lhs> - <Expr rhs>`: return sub(cst2ast(lhs), cst2ast(rhs), src=e@\loc);
+
+    case (Expr)`!<Expr expr>`: return neg(cst2ast(expr), src=e@\loc);
     case (Expr)`<Expr lhs> \> <Expr rhs>`: return gt(cst2ast(lhs), cst2ast(rhs), src=e@\loc);
     case (Expr)`<Expr lhs> \>= <Expr rhs>`: return geq(cst2ast(lhs), cst2ast(rhs), src=e@\loc);
     case (Expr)`<Expr lhs> \< <Expr rhs>`: return lt(cst2ast(lhs), cst2ast(rhs), src=e@\loc);
@@ -60,9 +62,11 @@ AExpr cst2ast(Expr e) {
     case (Expr)`<Expr lhs> != <Expr rhs>`: return neq(cst2ast(lhs), cst2ast(rhs), src=e@\loc);
     case (Expr)`<Expr lhs> && <Expr rhs>`: return and(cst2ast(lhs), cst2ast(rhs), src=e@\loc);
     case (Expr)`<Expr lhs> || <Expr rhs>`: return or(cst2ast(lhs), cst2ast(rhs), src=e@\loc);
-    case (Expr)`<Bool val>`: return \bool(fromString("<val>"), src=val@\loc);
-    case (Expr)`<Int val>`: return \int(toInt("<val>"), src=val@\loc);
-    case (Expr)`<Str val>`: return \str("<val>"[1..-1], src=val@\loc);
+
+    case (Expr)`<Bool val>`: return lit(fromString("<val>"), src=val@\loc);
+    case (Expr)`<Int val>`: return lit(toInt("<val>"), src=val@\loc);
+    case (Expr)`<Str val>`: return lit("<val>"[1..-1], src=val@\loc);
+
     default: throw "Unhandled expression: <e>";
   }
 }
