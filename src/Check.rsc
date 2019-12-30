@@ -3,9 +3,6 @@ module Check
 import AST;
 import Resolve;
 import Message; // see standard library
-import IO;
-import Set;
-import List;
 
 data Type
   = tint()
@@ -60,10 +57,10 @@ set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
       msgs += { error("Expression type must match declared question type", e.src) | typeOf(e, tenv, useDef) != atype2type(\type) } + check(e, tenv, useDef);
     }
     case \if(condition, qs):
-      msgs += check(condition, tenv, useDef) + { error("Condition of `if` statement must be of type `boolean`", condition.src) | typeOf(condition, tenv, useDef) != tbool() } + { *check(q, tenv, useDef) | AQuestion q <- qs };
+      msgs += check(condition, tenv, useDef) + { error("Condition of `if` statement must be of type `boolean`", condition.src) | typeOf(condition, tenv, useDef) notin { tbool(), tunknown() } } + { *check(q, tenv, useDef) | AQuestion q <- qs };
 
     case if_else(condition, qs, alt_qs):
-      msgs += check(condition, tenv, useDef) + { error("Condition of `if` statement must be of type `boolean`", condition.src) | typeOf(condition, tenv, useDef) != tbool() } + { *check(q, tenv, useDef) | AQuestion q <- (qs + alt_qs) };
+      msgs += check(condition, tenv, useDef) + { error("Condition of `if` statement must be of type `boolean`", condition.src) | typeOf(condition, tenv, useDef) notin { tbool(), tunknown() } } + { *check(q, tenv, useDef) | AQuestion q <- (qs + alt_qs) };
   }
   
   return msgs;
