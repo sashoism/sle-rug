@@ -27,7 +27,7 @@ syntax Question
 
 syntax Expr 
  = Ident
- | "(" Expr ")"
+ | bracket "(" Expr ")"
  > right neg: "!" Expr
  > left (
     mul: Expr "*" Expr
