@@ -51,9 +51,22 @@ VEnv eval(AQuestion q, Input inp, VEnv venv) {
 
 Value eval(AExpr e, VEnv venv) {
   switch (e) {
+    case ref(bool x): return venv[x];
+    case ref(int x): return venv[x];
     case ref(str x): return venv[x];
-    
-    // etc.
+    case mul(Expr lhs, Expr rhs): return eval(lhs, env, penv) * eval(rhs, env, penv);
+    case div(Expr lhs, Expr rhs): return eval(lhs, env, penv) / eval(rhs, env, penv);
+    case add(Expr lhs, Expr rhs): return eval(lhs, env, penv) + eval(rhs, env, penv);
+    case sub(Expr lhs, Expr rhs): return eval(lhs, env, penv) - eval(rhs, env, penv);
+    case neg(Expr lhs, Expr rhs): return !eval(lhs, env, penv); //TODO: Use eval with lhs or rhs?
+    case gt(Expr lhs, Expr rhs): return eval(lhs, env, penv) > eval(rhs, env, penv) ? 1 : 0;
+    case get(Expr lhs, Expr rhs): return eval(lhs, env, penv) >= eval(rhs, env, penv)? 1 : 0;
+    case lt(Expr lhs, Expr rhs): return eval(lhs, env, penv) < eval(rhs, env, penv)? 1 : 0;
+    case leq(Expr lhs, Expr rhs): return eval(lhs, env, penv) <= eval(rhs, env, penv)? 1 : 0;
+    case eql(Expr lhs, Expr rhs): return eval(lhs, env, penv) == eval(rhs, env, penv)? 1 : 0;
+    case neq(Expr lhs, Expr rhs): return eval(lhs, env, penv) != eval(rhs, env, penv)? 1 : 0;
+    case and(Expr lhs, Expr rhs): return eval(lhs, env, penv) && eval(rhs, env, penv)? 1 : 0;
+    case or(Expr lhs, Expr rhs): return eval(lhs, env, penv) || eval(rhs, env, penv)? 1 : 0;
     
     default: throw "Unsupported expression <e>";
   }
