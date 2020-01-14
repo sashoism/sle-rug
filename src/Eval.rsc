@@ -51,7 +51,7 @@ VEnv eval(AQuestion q, Input inp, VEnv venv) {
 
 Value eval(AExpr e, VEnv venv) {
   switch (e) {
-  	case ref(str x): return venv[x];
+  	case ref(id(str x)): return venv[x];
     case mul(Expr lhs, Expr rhs): return eval(lhs, env, penv) * eval(rhs, env, penv);
     case div(Expr lhs, Expr rhs): return eval(lhs, env, penv) / eval(rhs, env, penv);
     case add(Expr lhs, Expr rhs): return eval(lhs, env, penv) + eval(rhs, env, penv);
