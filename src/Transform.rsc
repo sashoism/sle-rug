@@ -30,13 +30,23 @@ import ParseTree; // necessary for `x@\loc`
  */
  
 AForm flatten(AForm f) {
-  return f; 
+  return form(f.name, [*flatten(q, \lit(true)) | q <- f.questions], src = f.src);
 }
+
+list[AQuestion] flatten(\if(condition, qs), AExpr accumulator) =
+  [*flatten(q, new) | q <- qs]
+    when new := and(accumulator, condition);
+
+list[AQuestion] flatten(\if_else(condition, qs, alt_qs), AExpr accumulator) =
+  [*flatten(q, new) | q <- qs] + [*flatten(q, alt) | q <- alt_qs]
+    when new := and(accumulator, condition), alt := and(accumulator, neg(condition));
+
+list[AQuestion] flatten(AQuestion q, AExpr accumulator) = [\if(accumulator, [q])];
 
 start[Form] rename(start[Form] f, loc useOrDef, str newName, RefGraph refs) {
   Id new = [Id] newName;
 
-  return visit(f) {
+  return visit (f) {
     case (Expr) `<Id x>` => (Expr) `<Id new>`
       when
         (<useOrDef, loc def> <- refs.useDef || def := useOrDef), // assign definition location to `def`
