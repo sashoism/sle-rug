@@ -3,6 +3,7 @@ module Transform
 import Syntax;
 import Resolve;
 import AST;
+import ParseTree; // necessary for `x@\loc`
 
 /* 
  * Transforming QL forms
@@ -32,17 +33,23 @@ AForm flatten(AForm f) {
   return f; 
 }
 
-/* Rename refactoring:
- *
- * Write a refactoring transformation that consistently renames all occurrences of the same name.
- * Use the results of name resolution to find the equivalence class of a name.
- *
- */
- 
- start[Form] rename(start[Form] f, loc useOrDef, str newName, UseDef useDef) {
-   return f; 
- } 
- 
- 
- 
+start[Form] rename(start[Form] f, loc useOrDef, str newName, RefGraph refs) {
+  Id new = [Id] newName;
 
+  return visit(f) {
+    case (Expr) `<Id x>` => (Expr) `<Id new>`
+      when
+        (<useOrDef, loc def> <- refs.useDef || def := useOrDef), // assign definition location to `def`
+        use := x@\loc, <use, def> <- refs.useDef // transform if current node is in the uses of `def`
+
+    case (Question) `<Str label> <Id x> : <Type t>` => (Question) `<Str label> <Id new> : <Type t>`
+      when
+        (<useOrDef, loc def> <- refs.useDef || def := useOrDef),
+        def == x@\loc
+
+    case (Question) `<Str label> <Id x> : <Type t> = <Expr expr>` => (Question) `<Str label> <Id new> : <Type t> = <Expr expr>`
+      when
+        (<useOrDef, loc def> <- refs.useDef || def := useOrDef),
+        def == x@\loc
+  }
+}
