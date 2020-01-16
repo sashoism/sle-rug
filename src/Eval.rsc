@@ -27,7 +27,16 @@ data Input
 // produce an environment which for each question has a default value
 // (e.g. 0 for int, "" for str etc.)
 VEnv initialEnv(AForm f) {
-  return ();
+  venv = VEnv();
+  for (q <- f.questions) {
+    t = q.\type;
+    switch(t) {
+      case "boolean": venv(q.Id, false);
+      case "integer": venv(q.Id, 0);
+      case "string": venv(q.Id, "");
+    }
+  }
+  return venv;
 }
 
 
@@ -40,13 +49,27 @@ VEnv eval(AForm f, Input inp, VEnv venv) {
 }
 
 VEnv evalOnce(AForm f, Input inp, VEnv venv) {
-  return (); 
+  for (q <- f.questions) {
+    venv = eval(q, inp, venv);
+  }
+  return venv; 
 }
 
 VEnv eval(AQuestion q, Input inp, VEnv venv) {
   // evaluate conditions for branching,
   // evaluate inp and computed questions to return updated VEnv
-  return (); 
+  switch(q) {
+    case question(str label, AId id, AType \type): venv(id, inp);
+    case question(str label, AId id, AType \type, AExpr expr): venv(id, eval(expr, venv));
+    case \if(AExpr condition, list[AQuestion] questions): 
+      if (eval(condition, venv)) {
+        for (q <- questions) {
+          venv = eval(q, inp, venv);
+        }
+      }  
+  }
+  
+  return venv; 
 }
 
 Value eval(AExpr e, VEnv venv) {
