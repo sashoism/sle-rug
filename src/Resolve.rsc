@@ -7,7 +7,6 @@ import AST;
  */ 
 
 
-// modeling declaring occurrences of names
 alias Def = rel[str name, loc def];
 
 // modeling use occurrences of names

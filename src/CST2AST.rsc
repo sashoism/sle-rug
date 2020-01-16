@@ -8,31 +8,21 @@ import String;
 
 import Boolean;
 
-/*
- * Implement a mapping from concrete syntax trees (CSTs) to abstract syntax trees (ASTs)
- *
- * - Use switch to do case distinction with concrete patterns (like in Hack your JS) 
- * - Map regular CST arguments (e.g., *, +, ?) to lists 
- *   (NB: you can iterate over * / + arguments using `<-` in comprehensions or for-loops).
- * - Map lexical nodes to Rascal primitive types (bool, int, str)
- * - See the ref example on how to obtain and propagate source locations.
- */
-
 AForm cst2ast(start[Form] sf) {
-  Form f = sf.top; // remove layout before and after form
+  Form f = sf.top;
   switch (f) {
-	case (Form) `form <Ident title> { <Question* qs> }`:
+	case (Form) `form <Id title> { <Question* qs> }`:
 	  return form("<title>", [ cst2ast(q) | Question q <- qs ], src=f@\loc);
-	default: throw "Unhandled form expression: <f>";
+	default: throw "Unhandled form: <f>";
   }
 }
 
 AQuestion cst2ast(Question q) {
   switch (q) {
-  	case (Question) `<Str label> <Id var> : <Type t>`:
-  		return question("<label>"[1..-1], id("<var>", src=var@\loc), cst2ast(t), src=q@\loc);
-  	case (Question) `<Str label> <Id var> : <Type t> = <Expr expr>`:
-  		return question("<label>"[1..-1], id("<var>", src=var@\loc), cst2ast(t), cst2ast(expr), src=q@\loc);
+  	case (Question) `<Str label> <Id x> : <Type t>`:
+  		return question("<label>"[1..-1], id("<x>", src=x@\loc), cst2ast(t), src=q@\loc);
+  	case (Question) `<Str label> <Id x> : <Type t> = <Expr expr>`:
+  		return question("<label>"[1..-1], id("<x>", src=x@\loc), cst2ast(t), cst2ast(expr), src=q@\loc);
   	case (Question) `if ( <Expr condition> ) { <Question* qs> }`:
   		return \if(cst2ast(condition), [ cst2ast(q) | Question q <- qs ], src=q@\loc);
 	case (Question) `if ( <Expr condition> ) { <Question* qs> } else { <Question* alt_qs> }`:
@@ -40,12 +30,13 @@ AQuestion cst2ast(Question q) {
 					[ cst2ast(q) | Question q <- qs ],
 					[ cst2ast(q) | Question q <- alt_qs ], src=q@\loc
   				);
+	default: throw "Unhandled question: <q>";
   }
 }
 
 AExpr cst2ast(Expr e) {
   switch (e) {
-    case (Expr)`<Ident x>`: return ref(id("<x>", src=x@\loc), src=x@\loc);
+    case (Expr)`<Id x>`: return ref(id("<x>", src=x@\loc), src=x@\loc);
     case (Expr)`( <Expr expr> )`: return cst2ast(expr);
 
     case (Expr)`<Expr lhs> * <Expr rhs>`: return mul(cst2ast(lhs), cst2ast(rhs), src=e@\loc);

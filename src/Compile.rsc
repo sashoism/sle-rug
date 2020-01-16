@@ -3,21 +3,9 @@ module Compile
 import AST;
 import Resolve;
 import IO;
-import lang::html5::DOM; // see standard library
+import lang::html5::DOM;
 import List;
 
-/*
- * Implement a compiler for QL to HTML and Javascript
- *
- * - assume the form is type- and name-correct
- * - separate the compiler in two parts form2html and form2js producing 2 files
- * - use string templates to generate Javascript
- * - use the HTML5Node type and the `str toString(HTML5Node x)` function to format to string
- * - use any client web framework (e.g. Vue, React, jQuery, whatever) you like for event handling
- * - map booleans to checkboxes, strings to textfields, ints to numeric text fields
- * - be sure to generate uneditable widgets for computed questions!
- * - if needed, use the name analysis to link uses to definitions
- */
 
 void compile(AForm f) {
   writeFile(f.src[extension="js"].top, form2js(f));
@@ -103,6 +91,8 @@ str vue_data(AForm f) =
   intercalate(", ", ["<name>: <defaultValue(\type)>" | /question(_, id(name), \type) := f])
   + " }";
 
+
+/* we cannot use arrow-style functions in this context */
 str vue_computed(AForm f) =
   "{ " +
   intercalate(", ", ["<name>: function () { return <expr2js(expr)>; }" | /question(_, id(name), _, expr) := f])
@@ -111,7 +101,7 @@ str vue_computed(AForm f) =
 str expr2js(AExpr e) {
   switch (e) {
     case ref(AId x):
-      return "this.<x.name>"; // 'this' is required by Vue when referencing variables in computed getters
+      return "this.<x.name>"; /* 'this' is required by Vue when referencing variables in computed getters */
 
     case mul(AExpr lhs, AExpr rhs):
       return "(<expr2js(lhs)> * <expr2js(rhs)>)";
@@ -163,6 +153,11 @@ str expr2js(AExpr e) {
   }
 }
 
+/* (https://vuejs.org/v2/guide/forms.html#Basic-Usage)
+  v-model will ignore the initial value, checked or selected attributes found on any
+  form elements. It will always treat the Vue instance data as the source of truth. You should
+  declare the initial value on the JavaScript side, inside the data option of your component.
+*/
 value defaultValue(boolean()) = false;
 value defaultValue(integer()) = 0;
 value defaultValue(string()) = "\'\'";
