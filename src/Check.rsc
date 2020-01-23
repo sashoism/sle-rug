@@ -37,6 +37,15 @@ set[Message] check(AForm f, TEnv tenv, UseDef useDef) {
   for (q <- f.questions) {
     msgs += check(q, tenv, useDef);
   }
+
+  /* construct relation of question definitions to the definitions of their dependencies */
+  rel[loc,loc] dependencies = {};
+  for (/question(_, id(_, src = loc def), _, e) <- f.questions) {
+    dependencies += { def } * { def | /ref(_, src = loc use) := e, <use, loc def> <- useDef };
+  }
+  /* loops in the transitive closure of the constructed relation are dependency cycles */
+  msgs += { error("Data dependency cycle detected: question value (in)directly uses its own definition", def) | <def, def> <- dependencies+ };
+
   return msgs; 
 }
 
@@ -161,5 +170,3 @@ Type typeOf(AExpr e, TEnv tenv, UseDef useDef) {
 
   return tunknown(); 
 }
- 
-
