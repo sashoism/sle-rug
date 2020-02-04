@@ -65,4 +65,4 @@ lexical Int
  | [1-9][0-9]*
  ;
 
-lexical Str = [\"] ![\"]* [\"];
+lexical Str = @Category="StringLiteral" [\"] ![\"]* [\"];
