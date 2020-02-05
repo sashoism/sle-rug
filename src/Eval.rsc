@@ -149,7 +149,7 @@ test bool binary() {
 	println("[INPUT] x_1_5 = true");
 	venv = pprintEval(ast, input("x_1_5", vbool(true)), venv);
 
-	println("[INPUT] x_1_53 = true");
+	println("[INPUT] x_1_3 = true");
 	venv = pprintEval(ast, input("x_1_3", vbool(true)), venv);
 
 	println("[INPUT] x_1_2 = true");

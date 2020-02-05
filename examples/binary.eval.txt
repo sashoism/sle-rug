@@ -17,7 +17,7 @@ Running tests for Eval
   "x_1_10":vbool(true),
   "x_1_3":vbool(false)
 )
-[INPUT] x_1_53 = true
+[INPUT] x_1_3 = true
 (
   "x_1_5":vbool(true),
   "answer_2_3":vint(2),
