@@ -46,20 +46,16 @@ list[AQuestion] flatten(AQuestion q, AExpr accumulator) = [\if(accumulator, [q])
 start[Form] rename(start[Form] f, loc useOrDef, str newName, RefGraph refs) {
   Id new = [Id] newName;
 
+  loc def = useOrDef;
+  if (<useOrDef, loc d> <- refs.useDef) {
+    def = d;
+  }
+
   return visit (f) {
-    case (Expr) `<Id x>` => (Expr) `<Id new>`
-      when
-        (<useOrDef, loc def> <- refs.useDef || def := useOrDef), // assign definition location to `def`
-        use := x@\loc, <use, def> <- refs.useDef // transform if current node is in the uses of `def`
+    case (Id) `<Id x>` => (Id) `<Id new>`
+      when use := x@\loc, <use, def> <- refs.useDef
 
-    case (Question) `<Str label> <Id x> : <Type t>` => (Question) `<Str label> <Id new> : <Type t>`
-      when
-        (<useOrDef, loc def> <- refs.useDef || def := useOrDef),
-        def == x@\loc
-
-    case (Question) `<Str label> <Id x> : <Type t> = <Expr expr>` => (Question) `<Str label> <Id new> : <Type t> = <Expr expr>`
-      when
-        (<useOrDef, loc def> <- refs.useDef || def := useOrDef),
-        def == x@\loc
+    case (Id) `<Id x>` => (Id) `<Id new>`
+      when x@\loc == def
   }
 }

@@ -1,0 +1,46 @@
+Running tests for Eval
+| testing 0/1 
+[INPUT] x_1_10 = true
+(
+  "x_1_5":vbool(false),
+  "x_7_8":vbool(false),
+  "x_8_9":vbool(false),
+  "x_1_10":vbool(true),
+  "x_5_7":vbool(false),
+  "answer_9_10":vint(9)
+)
+[INPUT] x_1_5 = true
+(
+  "x_1_5":vbool(true),
+  "x_3_4":vbool(false),
+  "answer_4_5":vint(4),
+  "x_1_10":vbool(true),
+  "x_1_3":vbool(false)
+)
+[INPUT] x_1_3 = true
+(
+  "x_1_5":vbool(true),
+  "answer_2_3":vint(2),
+  "x_1_10":vbool(true),
+  "x_1_2":vbool(false),
+  "x_1_3":vbool(true)
+)
+[INPUT] x_1_2 = true
+(
+  "x_1_5":vbool(true),
+  "answer_1_2":vint(1),
+  "x_1_10":vbool(true),
+  "x_1_2":vbool(true),
+  "x_1_3":vbool(true)
+)
+[INPUT] x_1_5 = false
+(
+  "x_1_5":vbool(false),
+  "x_7_8":vbool(false),
+  "x_8_9":vbool(false),
+  "x_1_10":vbool(true),
+  "x_5_7":vbool(false),
+  "answer_9_10":vint(9)
+)
+Test report for Evals                                                       
+        all 1/1 tests succeeded

@@ -149,7 +149,7 @@ str expr2js(AExpr e) {
       return "<integer>";
 
     case lit(str string):
-      return string;
+      return "\"" + string + "\"";
   }
 }
 
